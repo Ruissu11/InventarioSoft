@@ -1,0 +1,26 @@
+info:
+  name: probar alerta de stock minimo
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: http://localhost:3000/inventory/movement
+  body:
+    type: json
+    data: |-
+      {
+        "product_id":   "ff094672-bbad-40cc-b5d0-85ad11fb1417",
+        "warehouse_id": "8739eeb2-4345-4c85-a20d-8539c9a78eeb",
+        "type":         "exit",
+        "quantity":     15,
+        "notes":        "Salida por venta",
+        "reference":    "VTA-002"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

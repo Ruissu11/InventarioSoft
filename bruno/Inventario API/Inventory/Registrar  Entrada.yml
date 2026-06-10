@@ -1,11 +1,11 @@
 info:
-  name: Crear producto
+  name: Registrar  Entrada
   type: http
   seq: 1
 
 http:
   method: POST
-  url: http://localhost:3000/products
+  url: http://localhost:3000/inventory/movement
   auth: inherit
 
 settings:
