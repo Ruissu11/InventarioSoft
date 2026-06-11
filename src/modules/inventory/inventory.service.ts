@@ -1,15 +1,13 @@
 import db    from "../../shared/db"
-import redis from "../../shared/redis"
-
-const CACHE_KEY = "inventory:all"
+import { getPagination, buildMeta } from "../../shared/pagination"
 
 export const InventoryService = {
 
-    async getAll() {
-        const cached = await redis.get(CACHE_KEY)
-        if (cached) return JSON.parse(cached)
+    async getAll(page = 1, limit = 20) {
+        const { limit: lim, offset } = getPagination(page, limit)
 
-        const inventory = await db`
+        const [inventory, [{ total }]] = await Promise.all([
+            db`
             SELECT
                 i.id,
                 i.quantity,
@@ -26,10 +24,18 @@ export const InventoryService = {
             JOIN warehouses w ON w.id = i.warehouse_id
             WHERE p.is_active = true
             ORDER BY p.name ASC, w.name ASC
-        `
+            LIMIT  ${lim}
+            OFFSET ${offset}
+            `,
+            db`
+            SELECT COUNT(*)::int AS total
+            FROM inventory i
+            JOIN products p ON p.id = i.product_id
+            WHERE p.is_active = true
+            `
+        ])
 
-        await redis.set(CACHE_KEY, JSON.stringify(inventory), "EX", 30)
-        return inventory
+        return { data: inventory, meta: buildMeta(page, lim, total) }
     },
 
     async getByProduct(productId: string) {
@@ -138,11 +144,6 @@ if (existing.length > 0) {
                 minimum:      product.minimum_stock
             }
         })
-
-        // Invalidar cachés después de la transacción exitosa
-        await redis.del(CACHE_KEY)
-        await redis.del("products:all")
-
         return result
     }
 }

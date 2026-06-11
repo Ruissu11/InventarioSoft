@@ -5,7 +5,14 @@ info:
 
 http:
   method: DELETE
-  url: http://localhost:3000/users/<uuid_del_operator>
+  url: http://localhost:3000/users/8a9d1294-9a94-4be0-8ef1-db317367d7d4?A=
+  headers:
+    - name: Authorization
+      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYzZjZGNlYi05YTQxLTQ0ZGYtOGNhNC1jMGYxOWFjZTkxZjEiLCJlbWFpbCI6ImFkbWluQGludmVudGFyaW8uY29tIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzgxNzM0MjIwLCJpYXQiOjE3ODExMjk0MjB9.4nS3ww_oCVsPXbV6Ar_h83OOHWA_OvM3RBR8d0dED14
+  params:
+    - name: A
+      value: ""
+      type: query
   auth: inherit
 
 settings:

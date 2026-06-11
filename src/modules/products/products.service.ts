@@ -1,5 +1,5 @@
 import db    from "../../shared/db"
-import redis from "../../shared/redis"
+import { getPagination, buildMeta } from "../../shared/pagination"
 
 // Tiempo de vida del caché en segundos.
 // 60 segundos significa: la primera petición va a BD,
@@ -9,24 +9,15 @@ const CACHE_KEY = "products:all"
 
 export const ProductsService = {
 
-    async getAll() {
-        // 1. Intentar desde caché
-        const cached = await redis.get(CACHE_KEY)
-        if (cached) {
-            return JSON.parse(cached)
-        }
-
-        // 2. Cache miss — ir a la BD
-        const products = await db`
+    async getAll(page = 1, limit = 20) {
+       const { limit: lim, offset } = getPagination(page, limit)
+         // Promise.all ejecuta ambas queries en paralelo — no en secuencia.
+         // Sin esto: query1 (~20ms) + query2 (~20ms) = ~40ms.
+         // Con esto: ambas corren a la vez = ~20ms total.
+        const [products, [{ total }]] = await Promise.all([
+            db`
             SELECT
-                p.id,
-                p.sku,
-                p.name,
-                p.description,
-                p.unit_price,
-                p.unit,
-                p.minimum_stock,
-                p.is_active,
+                p.*,
                 c.name AS category_name,
                 s.name AS supplier_name
             FROM products p
@@ -34,12 +25,17 @@ export const ProductsService = {
             LEFT JOIN suppliers  s ON s.id = p.supplier_id
             WHERE p.is_active = true
             ORDER BY p.name ASC
-        `
+            LIMIT  ${lim}
+            OFFSET ${offset}
+            `,
+            db`
+            SELECT COUNT(*)::int AS total
+            FROM products
+            WHERE is_active = true
+            `
+        ])
 
-        // 3. Guardar en caché para las próximas peticiones
-        await redis.set(CACHE_KEY, JSON.stringify(products), "EX", CACHE_TTL)
-
-        return products
+        return { data: products, meta: buildMeta(page, lim, total) }
     },
 
     async getById(id: string) {
@@ -69,10 +65,6 @@ export const ProductsService = {
                  ${data.minimum_stock ?? 0})
             RETURNING *
         `
-
-        // Invalidar caché: los datos cambiaron
-        await redis.del(CACHE_KEY)
-
         return product
     },
 
@@ -86,9 +78,6 @@ export const ProductsService = {
               AND is_active = true
             RETURNING *
         `
-
-        await redis.del(CACHE_KEY)
-
         return product ?? null
     },
 
@@ -102,9 +91,6 @@ export const ProductsService = {
               AND is_active = true
             RETURNING id
         `
-
-        if (product) await redis.del(CACHE_KEY)
-
         return product ?? null
     }
 }

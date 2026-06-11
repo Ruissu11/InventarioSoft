@@ -1,17 +1,20 @@
 info:
-  name: Login2
+  name: Nombre Duplicado
   type: http
-  seq: 3
+  seq: 2
 
 http:
-  method: GET
-  url: http://localhost:3000/users
+  method: POST
+  url: http://localhost:3000/categories
   headers:
     - name: Authorization
       value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYzZjZGNlYi05YTQxLTQ0ZGYtOGNhNC1jMGYxOWFjZTkxZjEiLCJlbWFpbCI6ImFkbWluQGludmVudGFyaW8uY29tIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzgxNzM0MjIwLCJpYXQiOjE3ODExMjk0MjB9.4nS3ww_oCVsPXbV6Ar_h83OOHWA_OvM3RBR8d0dED14
   body:
     type: json
-    data: ""
+    data: |-
+      {
+        "name": "Electrónica"
+      }
   auth: inherit
 
 settings:

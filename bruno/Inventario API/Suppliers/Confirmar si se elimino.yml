@@ -1,17 +1,14 @@
 info:
-  name: Login2
+  name: Confirmar si se elimino
   type: http
-  seq: 3
+  seq: 7
 
 http:
-  method: GET
-  url: http://localhost:3000/users
+  method: DELETE
+  url: http://localhost:3000/suppliers/1554f79b-c3a3-4f4a-9682-15e23249b5ad
   headers:
     - name: Authorization
       value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYzZjZGNlYi05YTQxLTQ0ZGYtOGNhNC1jMGYxOWFjZTkxZjEiLCJlbWFpbCI6ImFkbWluQGludmVudGFyaW8uY29tIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzgxNzM0MjIwLCJpYXQiOjE3ODExMjk0MjB9.4nS3ww_oCVsPXbV6Ar_h83OOHWA_OvM3RBR8d0dED14
-  body:
-    type: json
-    data: ""
   auth: inherit
 
 settings:

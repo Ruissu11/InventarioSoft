@@ -1,0 +1,15 @@
+info:
+  name: Editar
+  type: http
+  seq: 5
+
+http:
+  method: PUT
+  url: http://localhost:3000/warehouses/<uuid_del_warehouse>
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
